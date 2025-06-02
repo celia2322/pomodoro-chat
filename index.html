@@ -7,54 +7,80 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f4f4f4;
+      background-color: #f6ede3; /* Marron très clair */
       padding: 30px;
     }
 
     .container {
-      background-color: #e0e0e0;
+      background-color: #f6ede3;
       border-radius: 20px;
       padding: 30px;
       max-width: 350px;
       margin: auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .container img {
       width: 100%;
       border-radius: 15px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     #timer {
-      font-size: 48px;
-      margin: 20px 0;
+      font-size: 50px;
+      margin: 25px 0;
+      color: #4b2e22;
     }
 
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
+    .button {
+      width: 60px;
+      height: 60px;
+      margin: 10px;
+      border-radius: 50%;
       border: none;
-      border-radius: 8px;
+      font-size: 24px;
+      color: white;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.1s;
     }
 
-    #startBtn { background-color: #4CAF50; color: white; }
-    #pauseBtn { background-color: #f0ad4e; color: white; }
-    #resetBtn { background-color: #d9534f; color: white; } 
+    .button:active {
+      transform: scale(0.95);
+    }
+
+    #startBtn {
+      background-color: #4b2e22; /* Marron foncé */
+    }
+
+    #pauseBtn {
+      background-color: #6f4e37; /* Marron moyen */
+    }
+
+    #resetBtn {
+      background-color: #a67b5b; /* Marron clair */
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Remplace le chemin par ton image -->
+    <!-- Remplace ce chemin par l’URL ou le nom de ton image -->
     <img src="https://i.pinimg.com/736x/93/f5/ae/93f5aeaab9cdfa21239d6e0d3b6d0f37.jpg" alt="Image Pomodoro">
 
     <div id="timer">25:00</div>
-    <button id="startBtn">Démarrer</button>
-    <button id="pauseBtn">Pause</button>
-    <button id="resetBtn">Reset</button>
+
+    <button id="startBtn" class="button" title="Démarrer">▶️</button>
+    <button id="pauseBtn" class="button" title="Pause">⏸️</button>
+    <button id="resetBtn" class="button" title="Reset">🔄</button>
+
+    <!-- Son d'alarme (tu peux changer le fichier) -->
+    <audio id="alarm-sound">
+      <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
+    </audio>
   </div>
 
   <script>
@@ -66,6 +92,7 @@
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const alarmSound = document.getElementById('alarm-sound');
 
     function updateTimerDisplay() {
       const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -83,7 +110,8 @@
         } else {
           clearInterval(timer);
           isRunning = false;
-          alert("Temps écoulé !");
+          updateTimerDisplay();
+          alarmSound.play();
         }
       }, 1000);
     }
