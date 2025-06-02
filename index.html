@@ -1,67 +1,69 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head> 
+<head>
   <meta charset="UTF-8">
-  <title>Pomodoro Timer</title>
+  <title>Pomodoro Personnalisé</title>
   <style>
     body {
-      font-family:Times new Roman;
-      text-align: center;
-      background-color: #f6ede3; /* Marron très clair */
-      padding: 30px;
+      font-family: Times New Roman;
+      background-color: #f3e7db; /* marron très clair */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
     }
 
-    .container { 
-      background-color: #f6ede3;
+    .container {
+      background-color: #f3e7db;
       border-radius: 20px;
-      padding: 30px;
-      max-width: 350px;
-      margin: auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .container img { 
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 400px;
       width: 100%;
-      border-radius: 15px;
-      margin-bottom: 20px;
+      text-align: center;
     }
 
     #timer {
       font-size: 50px;
-      margin: 25px 0;
       color: #4b2e22;
+      margin: 20px 0;
     }
 
-    .button {
-      width: 60px;
-      height: 60px;
-      margin: 10px;
-      border-radius: 50%;
-      border: none;
-      font-size: 24px;
-      color: white;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
+    .buttons {
+      display: flex;
       justify-content: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      gap: 20px;
+    }
+
+    .circle-button {
+      background: none;
+      border: none;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      padding: 0;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
       transition: transform 0.1s;
     }
 
-    .button:active {
+    .circle-button img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .circle-button:active {
       transform: scale(0.95);
     }
 
-    #startBtn {
-      background-color: #4b2e22; /* Marron foncé */
-    }
-
-    #pauseBtn {
-      background-color: #6f4e37; /* Marron moyen */
-    } 
-
-    #resetBtn {
-      background-color: #a67b5b; /* Marron clair */
+    #time-select {
+      margin-bottom: 20px;
+      font-size: 16px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #a67b5b;
     }
   </style>
 </head>
@@ -71,13 +73,32 @@
     <!-- Remplace ce chemin par l’URL ou le nom de ton image -->
     <img src="https://i.pinimg.com/736x/93/f5/ae/93f5aeaab9cdfa21239d6e0d3b6d0f37.jpg" alt="Image Pomodoro">
 
+  <div class="container">
+    <h2>Pomodoro Timer</h2>
+
+    <label for="time-select">Durée :</label>
+    <select id="time-select">
+      <option value="25">25 min</option>
+      <option value="30">30 min</option>
+      <option value="35">35 min</option>
+      <option value="40">40 min</option>
+    </select>
+
     <div id="timer">25:00</div>
 
-    <button id="startBtn" class="button" title="Démarrer">▶️</button>
-    <button id="pauseBtn" class="button" title="Pause">⏸️</button>
-    <button id="resetBtn" class="button" title="Reset">🔄</button>
+    <div class="buttons">
+      <button id="startBtn" class="circle-button" title="Démarrer">
+        <img src="play_icon.png" alt="Play">
+      </button>
+      <button id="pauseBtn" class="circle-button" title="Pause">
+        <img src="pause_icon.png" alt="Pause">
+      </button>
+      <button id="resetBtn" class="circle-button" title="Réinitialiser">
+        <img src="stop_icon.png" alt="Stop">
+      </button>
+    </div>
 
-    <!-- Son d'alarme (tu peux changer le fichier) -->
+    <!-- Alarme sonore -->
     <audio id="alarm-sound">
       <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
     </audio>
@@ -85,19 +106,21 @@
 
   <script>
     let timer;
-    let timeLeft = 25 * 60;
     let isRunning = false;
+    let duration = 25 * 60;
+    let timeLeft = duration;
 
     const timerDisplay = document.getElementById('timer');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
-    const alarmSound = document.getElementById('alarm-sound');
+    const timeSelect = document.getElementById('time-select');
+    const alarm = document.getElementById('alarm-sound');
 
-    function updateTimerDisplay() {
-      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-      const seconds = String(timeLeft % 60).padStart(2, '0');
-      timerDisplay.textContent = `${minutes}:${seconds}`;
+    function updateDisplay() {
+      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const sec = String(timeLeft % 60).padStart(2, '0');
+      timerDisplay.textContent = `${min}:${sec}`;
     }
 
     function startTimer() {
@@ -106,12 +129,11 @@
       timer = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
-          updateTimerDisplay();
+          updateDisplay();
         } else {
           clearInterval(timer);
           isRunning = false;
-          updateTimerDisplay();
-          alarmSound.play();
+          alarm.play();
         }
       }, 1000);
     }
@@ -124,15 +146,21 @@
     function resetTimer() {
       clearInterval(timer);
       isRunning = false;
-      timeLeft = 25 * 60;
-      updateTimerDisplay();
+      timeLeft = duration;
+      updateDisplay();
     }
+
+    timeSelect.addEventListener('change', () => {
+      duration = parseInt(timeSelect.value) * 60;
+      timeLeft = duration;
+      updateDisplay();
+    });
 
     startBtn.addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', pauseTimer);
     resetBtn.addEventListener('click', resetTimer);
 
-    updateTimerDisplay();
+    updateDisplay();
   </script>
 
 </body>
